@@ -1,18 +1,106 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo_application/widget/todo_item.dart';
 import 'package:flutter_todo_application/model/todo.dart';
+import 'package:flutter_todo_application/constant/custom_theme.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   Home({super.key});
 
-  final todoList = ToDo.todoList();
+  @override
+  State<Home> createState() => _HomeState();
+}
 
+class _HomeState extends State<Home> {
+  final todoList = ToDo.todoList();
+  final _todoController = TextEditingController();
+
+  // Function for CRUD(Create,Update and Delete)
+  void _handleOnchanged(ToDo todo) {
+    setState(() {
+      todo.isDone = !todo.isDone;
+    });
+  }
+
+  void _deleteTodoItem(String id) {
+    setState(() {
+      todoList.removeWhere((item) => item.id == id);
+    });
+  }
+
+  void _addTodoItem(String todo) {
+    setState(() {
+      if (todo.isNotEmpty) {
+        todoList.add(ToDo(
+            id: DateTime.now().microsecondsSinceEpoch.toString(),
+            date: DateTime.now().toString().substring(0, 10),
+            todoText: todo));
+      } else {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return Container(
+                padding: const EdgeInsets.all(20),
+                child: AlertDialog(
+                  title: Center(
+                    child: const Text('Please enter your job',
+                        style: TextStyle(fontSize: 19, color: Color.fromARGB(255, 241, 68, 68))),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Close'),
+                    ),
+                  ],
+                ),
+              );
+            });
+      }
+    });
+    _todoController.clear();
+  }
+
+  void _editTodoItem(ToDo todo) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        TextEditingController editController =
+            TextEditingController(text: todo.todoText);
+        return AlertDialog(
+          title: const Text('Update your job'),
+          content: TextField(
+            controller: editController,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  todo.todoText = editController.text;
+                });
+                Navigator.pop(context);
+              },
+              child: const Text('Save'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+// UI/UX of Todo Application
   @override
   Widget build(context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 243, 243, 243),
+      backgroundColor: CustomTheme.getTheme().primaryColor,
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 243, 243, 243),
+        backgroundColor: CustomTheme.getTheme().primaryColor,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -56,6 +144,9 @@ class Home extends StatelessWidget {
                       for (ToDo todoo in todoList)
                         TodoItem(
                           todo: todoo,
+                          onTodoChanged: _handleOnchanged,
+                          onDeleteItem: _deleteTodoItem,
+                          onEditItem: () => _editTodoItem(todoo),
                         ),
                     ],
                   ),
@@ -83,8 +174,9 @@ class Home extends StatelessWidget {
                       ],
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    child: const TextField(
-                      decoration: InputDecoration(
+                    child: TextField(
+                      controller: _todoController,
+                      decoration: const InputDecoration(
                         hintText: "Enter your job here",
                         border: InputBorder.none,
                       ),
@@ -93,14 +185,16 @@ class Home extends StatelessWidget {
                 ),
                 Container(
                   margin: const EdgeInsets.only(bottom: 20, right: 20),
-                  child:  ElevatedButton(
+                  child: ElevatedButton(
                     child: const Text(
                       '+',
                       style: TextStyle(
                         fontSize: 40,
                       ),
                     ),
-                    onPressed: (){},
+                    onPressed: () {
+                      _addTodoItem(_todoController.text);
+                    },
                   ),
                 )
               ],

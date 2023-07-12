@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo_application/model/todo.dart';
+import 'package:flutter_todo_application/constant/custom_theme.dart';
 class TodoItem extends StatelessWidget {
-  final ToDo todo ;
-  const TodoItem( {Key? key, required this.todo}): super(key: key);
- 
+  final ToDo todo;
+  final onTodoChanged;
+  final onDeleteItem;
+  final onEditItem;
+
+  const TodoItem({
+    Key? key,
+    required this.todo,
+    required this.onTodoChanged,
+    required this.onDeleteItem,
+    required this.onEditItem(),
+  }) : super(key: key);
+
   @override
   Widget build(context) {
     return Container(
@@ -12,24 +23,41 @@ class TodoItem extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        tileColor: Color.fromARGB(255, 255, 255, 255),
+        tileColor: CustomTheme.getTheme().cardColor,
         onTap: () {
-          print('click');
+          onTodoChanged(todo);
         },
-        title:  Text( todo.todoText,
-            style: const TextStyle(
-              fontSize: 15,
-              color: Colors.black,
-            )),
-        subtitle: const Text(
-          "22/07/2023",
-          style: TextStyle(fontSize: 12),
+        leading: Icon(
+          todo.isDone ? Icons.check_box : Icons.check_box_outline_blank,
+          color: Colors.blue,
+        ),
+        title: Text(
+          todo.todoText,
+          style: TextStyle(
+            fontSize: 15,
+            color: Colors.black,
+            decoration: todo.isDone ? TextDecoration.lineThrough : null,
+          ),
+        ),
+        subtitle: Text(
+          todo.date,
+          style: CustomTheme.getTheme().textTheme.bodySmall,
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            IconButton(onPressed: () {print('click edit button');}, icon: const Icon(Icons.edit)),
-            IconButton(onPressed: () {print('click delete button');}, icon: const Icon(Icons.delete)),
+            IconButton(
+                onPressed: () {
+                  onEditItem();
+                  print('click edit');
+                },
+                icon: const Icon(Icons.edit)),
+            IconButton(
+                onPressed: () {
+                  onDeleteItem(todo.id);
+                  print('click delete');
+                },
+                icon: const Icon(Icons.delete)),
           ],
         ),
       ),
