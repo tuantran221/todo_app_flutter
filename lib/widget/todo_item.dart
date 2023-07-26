@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo_application/model/todo.dart';
-import 'package:flutter_todo_application/constant/custom_theme.dart';
+
 class TodoItem extends StatelessWidget {
   final ToDo todo;
   final onTodoChanged;
@@ -23,7 +23,7 @@ class TodoItem extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        tileColor: CustomTheme.getTheme().cardColor,
+        tileColor: Colors.white,
         onTap: () {
           onTodoChanged(todo);
         },
@@ -41,7 +41,7 @@ class TodoItem extends StatelessWidget {
         ),
         subtitle: Text(
           todo.date,
-          style: CustomTheme.getTheme().textTheme.bodySmall,
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w100),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,

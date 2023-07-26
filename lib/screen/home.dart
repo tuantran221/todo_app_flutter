@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_todo_application/widget/todo_item.dart';
 import 'package:flutter_todo_application/model/todo.dart';
-import 'package:flutter_todo_application/constant/custom_theme.dart';
+import '../constant/crud_function.dart';
 
 class Home extends StatefulWidget {
-  Home({super.key});
+  final bool isDark;
+
+  const Home({Key? key, this.isDark = true}) : super(key: key);
 
   @override
-  State<Home> createState() => _HomeState();
+  _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
@@ -29,34 +31,7 @@ class _HomeState extends State<Home> {
 
   void _addTodoItem(String todo) {
     setState(() {
-      if (todo.isNotEmpty) {
-        todoList.add(ToDo(
-            id: DateTime.now().microsecondsSinceEpoch.toString(),
-            date: DateTime.now().toString().substring(0, 10),
-            todoText: todo));
-      } else {
-        showDialog(
-            context: context,
-            builder: (context) {
-              return Container(
-                padding: const EdgeInsets.all(20),
-                child: AlertDialog(
-                  title: Center(
-                    child: const Text('Please enter your job',
-                        style: TextStyle(fontSize: 19, color: Color.fromARGB(255, 241, 68, 68))),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Close'),
-                    ),
-                  ],
-                ),
-              );
-            });
-      }
+      addTodoItem(todo, todoList, context);
     });
     _todoController.clear();
   }
@@ -96,17 +71,17 @@ class _HomeState extends State<Home> {
 
 // UI/UX of Todo Application
   @override
-  Widget build(context) {
+  Widget build(BuildContext context) {
+    bool isDark = widget.isDark; // Extracting isDark from widget
+
     return Scaffold(
-      backgroundColor: CustomTheme.getTheme().primaryColor,
       appBar: AppBar(
-        backgroundColor: CustomTheme.getTheme().primaryColor,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Icon(
+            Icon(
               Icons.menu,
-              color: Color.fromARGB(255, 51, 51, 51),
+              color: isDark ? Colors.white : Color.fromARGB(255, 51, 51, 51),
               size: 30,
             ),
             Container(
@@ -115,7 +90,8 @@ class _HomeState extends State<Home> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Image.asset(
-                    'assets/images/alexander-hipp-iEEBWgY_6lA-unsplash.jpg'),
+                  'assets/images/alexander-hipp-iEEBWgY_6lA-unsplash.jpg',
+                ),
               ),
             ),
           ],
@@ -138,7 +114,9 @@ class _HomeState extends State<Home> {
                         child: const Text(
                           'All List To Do',
                           style: TextStyle(
-                              fontSize: 26, fontWeight: FontWeight.w500),
+                            fontSize: 26,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                       for (ToDo todoo in todoList)
@@ -160,24 +138,34 @@ class _HomeState extends State<Home> {
               children: [
                 Expanded(
                   child: Container(
-                    margin:
-                        const EdgeInsets.only(left: 15, right: 15, bottom: 15),
+                    margin: const EdgeInsets.only(
+                      left: 15,
+                      right: 15,
+                      bottom: 15,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       boxShadow: const [
                         BoxShadow(
-                            color: Colors.grey,
-                            blurRadius: 10.0,
-                            offset: Offset(0.0, 0.0),
-                            spreadRadius: 0.0 // Shadow position
-                            ),
+                          color: Colors.grey,
+                          blurRadius: 10.0,
+                          offset: Offset(0.0, 0.0),
+                          spreadRadius: 0.0,
+                        ),
                       ],
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: TextField(
                       controller: _todoController,
+                      style: const TextStyle(
+                        color: Color.fromARGB(255, 97, 97, 97),
+                      ),
                       decoration: const InputDecoration(
-                        hintText: "Enter your job here",
+                        hintText: "Type here",
+                        contentPadding: EdgeInsets.only(left: 20),
+                        hintStyle: TextStyle(
+                          color: Color.fromARGB(255, 97, 97, 97),
+                        ),
                         border: InputBorder.none,
                       ),
                     ),
